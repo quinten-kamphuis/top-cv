@@ -33,7 +33,12 @@ export default function Home() {
     setCredentials((prevData) => ({ ...prevData, [field]: value }));
   };
 
-  const handleArrayChange = (array, setArray, id, field) => (value) => {
+  const handleArrayChange = <T extends { id: number; [key: string]: any }>(
+    array: T[],
+    setArray: React.Dispatch<React.SetStateAction<T[]>>,
+    id: number,
+    field: keyof T
+  ) => (value: T[keyof T]) => {
     setArray((prevArray) =>
       prevArray.map((item) =>
         item.id === id ? { ...item, [field]: value } : item
@@ -41,25 +46,26 @@ export default function Home() {
     );
   };
 
-  const handleAddField = (array, setArray) => () => {
-    setArray((prevArray) => [
-      ...prevArray,
-      {
-        id: prevArray.length ? prevArray[prevArray.length - 1].id + 1 : 1,
-        institution: "",
-        location: "",
-        degree: "",
-        startDate: "",
-        endDate: "",
-        company: "",
-        position: "",
-      },
-    ]);
-  };
-
-  const handleRemoveField = (array, setArray, id) => () => {
-    setArray((prevArray) => prevArray.filter((item) => item.id !== id));
-  };
+  const handleAddField = <T extends { id: number; [key: string]: any }>(
+  array: T[],
+  setArray: React.Dispatch<React.SetStateAction<T[]>>,
+  newItem: Omit<T, "id">
+) => () => {
+  setArray((prevArray) => [
+    ...prevArray,
+    {
+      id: prevArray.length ? prevArray[prevArray.length - 1].id + 1 : 1,
+      ...newItem,
+    } as T,
+  ]);
+};
+const handleRemoveField = <T extends { id: number }>(
+  array: T[],
+  setArray: React.Dispatch<React.SetStateAction<T[]>>,
+  id: number
+) => () => {
+  setArray((prevArray) => prevArray.filter((item) => item.id !== id));
+};
 
   useEffect(() => {
     const savedCredentialsDetails = localStorage.getItem("credentials");
@@ -93,7 +99,7 @@ export default function Home() {
 
   return (
     <>
-      <div className="w-1/3 max-w-[600px] flex flex-col justify-between p-4 overflow-y-auto">
+      <div className="w-1/3 max-w-[400px] flex flex-col justify-between p-4 overflow-y-auto">
         <div>
         <InputField label="Photo" value='' onChange={handleCredentialChange("photo")} forPhoto />
         <Accordion type="single" collapsible>
@@ -147,7 +153,7 @@ export default function Home() {
                   <Separator />
                 </div>
               ))}
-              <button onClick={handleAddField(education, setEducation)} className="bg-sky-600 text-white px-2 py-1 rounded">
+              <button onClick={handleAddField(education, setEducation, {institution: "", location: "", degree: "", startDate: "", endDate: ""})} className="bg-sky-600 text-white px-2 py-1 rounded">
                 Add Education
               </button>
             </AccordionContent>
@@ -193,7 +199,7 @@ export default function Home() {
                   <Separator />
                 </div>
               ))}
-              <button onClick={handleAddField(experience, setExperience)} className="bg-sky-600 text-white px-2 py-1 rounded">
+              <button onClick={handleAddField(experience, setExperience, {company: "", location: "", position: "", startDate: "", endDate: ""})} className="bg-sky-600 text-white px-2 py-1 rounded">
                 Add Experience
               </button>
             </AccordionContent>

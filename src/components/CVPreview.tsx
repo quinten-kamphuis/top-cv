@@ -6,7 +6,31 @@ import { Separator } from './ui/separator'
 import CVComponent from './CVComponent'
 
 type Props = {
-    data?: any
+    data: {
+        credentials: {
+          photo: string;
+          name: string;
+          email: string;
+          phone: string;
+          dob: string;
+        };
+        education: {
+          id: number;
+          institution: string;
+          location: string;
+          degree: string;
+          startDate: string;
+          endDate: string;
+        }[];
+        experience: {
+          id: number;
+          company: string;
+          location: string;
+          position: string;
+          startDate: string;
+          endDate: string;
+        }[];
+    }
     zoom?: number
 }
 
